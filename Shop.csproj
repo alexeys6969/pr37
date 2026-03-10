@@ -16,8 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Mocks\" />
-    <Folder Include="Data\Interfaces\" />
     <Folder Include="Views\" />
     <Folder Include="Controllers\" />
   </ItemGroup>
