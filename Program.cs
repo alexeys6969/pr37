@@ -1,28 +1,10 @@
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddRazorPages();
-builder.Services.AddMvc(option =>
-{
-    option.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Version = "v1",
-        Title = "Пробная версия"
-    });
 
-    String PathFile = Path.Combine(System.AppContext.BaseDirectory, "Shop.xml");
-    option.IncludeXmlComments(PathFile);
-});
-
+builder.Services.AddMvc(option => option.EnableEndpointRouting = false);
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseRouting();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-app.useSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Пробная версия");
-});
-
+app.UseDeveloperExceptionPage();
+app.UseStatusCodePages();
+app.UseStaticFiles();
+app.UseMvcWithDefaultRoute();
 app.Run();
