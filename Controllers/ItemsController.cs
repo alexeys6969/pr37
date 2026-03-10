@@ -1,0 +1,25 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Shop.Data.Interfaces;
+
+namespace Shop.Controllers
+{
+    public class ItemsController : Controller
+    {
+        private IItems IAllItems;
+        private ICategorys IAllCategories;
+
+        public ItemsController(IItems IAllItems, ICategorys IAllCategories)
+        {
+            this.IAllItems = IAllItems;
+            this.IAllCategories = IAllCategories;
+        }
+
+        public ViewResult List()
+        {
+            ViewBag.Title = "Страница с предметами";
+
+            var cars = IAllItems.AllItems;
+            return View(cars);
+        }
+    }
+}
