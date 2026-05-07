@@ -1,3 +1,4 @@
+using Shop.Data.DataBase;
 using Shop.Data.Interfaces;
 using Shop.Data.Mocks;
 
@@ -5,8 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMvc(option => option.EnableEndpointRouting = false);
 
 
-builder.Services.AddTransient<ICategorys, MockCaregories>();
-builder.Services.AddTransient<IItems, MockItems>();
+builder.Services.AddTransient<ICategorys, DBCategory>();
+builder.Services.AddTransient<IItems, DBItems>();
 
 var app = builder.Build();
 
