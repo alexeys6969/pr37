@@ -3,7 +3,7 @@ using Shop.Data.Models;
 
 namespace Shop.Data.Mocks
 {
-    public class MockItems : IItems
+    public class MockItems 
     {
         public ICategorys _category = new MockCaregories();
 
