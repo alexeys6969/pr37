@@ -43,6 +43,22 @@
             </div>
         </div>
     </div>
+
+    if(item.Category.Id == Model.SelectCategory) {
+        <div class="item">
+            <img src="@item.Img"/>
+            <div class="basket">
+                <div class="button" id="@item.Id">
+                    В корзину
+                </div>
+                <div class="count">
+                    <div class="button_min">-</div>
+                    <div class="text">1</div>
+                    <div class="button_max">+</div>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 <script>
