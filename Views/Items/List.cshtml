@@ -8,15 +8,19 @@
 <div>
     <select onchange="SelectCategory(this)">
         <option value="0">Выбрать...</option>
-        @foreach(var Category in Model.Categories) {
-            if(Category.Id == Model.SelectCategory) {
+        @foreach (var Category in Model.Categories)
+        {
+            if (Category.Id == Model.SelectCategory)
+            {
                 <option selected="selected" value="@Category.Id">@Category.Name</option>
-            } else {
+            }
+            else
+            {
                 <option value="@Category.Id">@Category.Name</option>
             }
         }
     </select>
-    <a href="/Items/Add">Добавить товар</a>
+    <a href="/Items/Add" class="add-link">Добавить товар</a>
 </div>
 
 <h2>Все предметы</h2>
@@ -24,18 +28,30 @@
 @foreach (var item in Model.Items)
 {
     <div class="item">
-        <img src="@Url.Content(item.Img)" alt="@item.Name"/>
+        <img src="@Url.Content(item.Img)" alt="@item.Name" />
         <div class="data">
             <h3>Модель: @item.Name</h3>
             <div>Цена: @item.Price.ToString("c")</div>
             <div>Категория: @item.Category.Name</div>
             <div>Описание: @item.Description</div>
-            
+
+            <!-- Корзина -->
+            <div class="basket">
+                <div class="button" id="@item.Id" onclick="addToCart(@item.Id)">
+                    В корзину
+                </div>
+                <div class="count" id="count-@item.Id" style="display: none;">
+                    <div class="button_min" onclick="changeQuantity(@item.Id, -1)">-</div>
+                    <div class="text" id="quantity-@item.Id">1</div>
+                    <div class="button_max" onclick="changeQuantity(@item.Id, 1)">+</div>
+                </div>
+            </div>
+
             <!-- Кнопки действий -->
             <div class="actions">
                 <a href="/Items/Update/@item.Id">Редактировать</a>
-                
-                <form method="post" action="/Items/Delete" style="display:inline;" 
+
+                <form method="post" action="/Items/Delete" style="display:inline;"
                       onsubmit="return confirm('Удалить @item.Name?');">
                     <input type="hidden" name="id" value="@item.Id" />
                     <button type="submit" class="delete-btn">Удалить</button>
@@ -43,45 +59,80 @@
             </div>
         </div>
     </div>
-
-    if(item.Category.Id == Model.SelectCategory) {
-        <div class="item">
-            <img src="@item.Img"/>
-            <div class="basket">
-                <div class="button" id="@item.Id">
-                    В корзину
-                </div>
-                <div class="count">
-                    <div class="button_min">-</div>
-                    <div class="text">1</div>
-                    <div class="button_max">+</div>
-                </div>
-            </div>
-        </div>
-    }
 }
 
 <script>
     function SelectCategory(sender) {
         window.location = "/Items/List?Id=" + sender.value;
     }
-</script>
 
-<style>
-    .actions {
-        margin-top: 10px;
+    // Корзина
+    let cart = {};
+
+    function addToCart(itemId) {
+        if (!cart[itemId]) {
+            cart[itemId] = 1;
+        } else {
+            cart[itemId]++;
+        }
+
+        // Скрываем кнопку "В корзину", показываем счётчик
+        document.getElementById(itemId).style.display = 'none';
+        document.getElementById('count-' + itemId).style.display = 'flex';
+        document.getElementById('quantity-' + itemId).textContent = cart[itemId];
+
+        updateCartDisplay();
     }
-    .actions a, .actions button {
-        margin-right: 10px;
-        padding: 5px 10px;
-        text-decoration: none;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        cursor: pointer;
+
+    function changeQuantity(itemId, delta) {
+        cart[itemId] += delta;
+
+        if (cart[itemId] <= 0) {
+            delete cart[itemId];
+            // Показываем кнопку "В корзину", скрываем счётчик
+            document.getElementById(itemId).style.display = 'block';
+            document.getElementById('count-' + itemId).style.display = 'none';
+        } else {
+            document.getElementById('quantity-' + itemId).textContent = cart[itemId];
+        }
+
+        updateCartDisplay();
     }
-    .delete-btn {
-        background-color: #ff4444;
-        color: white;
-        border: none;
+
+    function updateCartDisplay() {
+        // Сохраняем корзину в localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        // Обновляем иконку корзины в хедере (если есть)
+        let totalItems = 0;
+        for (let id in cart) {
+            totalItems += cart[id];
+        }
+
+        let basketIcon = document.querySelector('.header .basket');
+        if (basketIcon && totalItems > 0) {
+            basketIcon.setAttribute('data-count', totalItems);
+        }
     }
-</style>
+
+    // Загрузка корзины при загрузке страницы
+    window.onload = function() {
+        let savedCart = localStorage.getItem('cart');
+        if (savedCart) {
+            cart = JSON.parse(savedCart);
+            // Показываем счётчики для товаров в корзине
+            for (let itemId in cart) {
+                let button = document.getElementById(itemId);
+                let countDiv = document.getElementById('count-' + itemId);
+                let quantity = document.getElementById('quantity-' + itemId);
+
+                if (button && countDiv && quantity) {
+                    button.style.display = 'none';
+                    countDiv.style.display = 'flex';
+                    quantity.textContent = cart[itemId];
+                }
+            }
+        }
+        updateCartDisplay();
+    };
+</script>
