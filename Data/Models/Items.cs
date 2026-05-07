@@ -14,5 +14,6 @@
         public int Price { get; set; }
         /// <summary> Категория товара
         public Categories Category { get; set; }
+        public Items(Items item = null)
     }
 }
